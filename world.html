@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- links -->
+  <link rel="icon" type="png" href="img/icon.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/world.css" />
+  <!-- Title -->
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="screen">
+    <!-- main section -->
+    <div class="section">
+      <div class="date">April 7, 2024</div>
+      <div class="button"><i class="fa-solid fa-circle-plus btn-icon"></i></div>
+    </div>
+    <!-- add section -->
+    <div class="section-box">
+      <div class="add-section">
+        <div class="add-section-title">
+          <h2>Add a new place</h2>
+        </div>
+        <!-- search -->
+        <div class="search">
+          <div class="search-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <input class="searchinput" type="text" placeholder="search...">
+        </div>
+        <!-- error message -->
+        <div class="messages">
+          <div class="error-message">City not found</div>
+          <div class="normal-message">Search your city to add</div>
+          <div class="added-message">Successfully added ✔</div>
+        </div>
+      </div>
+    </div>
+    <!-- All City -->
+     <div class="city-box"></div>
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal">
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-header">
+          <h3>Send Feedback</h3>
+          <button class="feedback-close" id="feedback-close">&times;</button>
+        </div>
+        <form id="feedback-form" class="feedback-form">
+          <div class="form-group">
+            <label for="feedback-name">Name</label>
+            <input type="text" id="feedback-name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="feedback-email">Email</label>
+            <input type="email" id="feedback-email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="feedback-message">Feedback</label>
+            <textarea id="feedback-message" name="message" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="feedback-submit">Send Feedback</button>
+        </form>
+      </div>
+    </div>
+    <!-- nav section -->
+    <nav>
+      <ul>
+        <li><a href="index.html"><i class="fa-solid fa-location-arrow"></i></a></li>
+        <li><a href="search.html"><i class="fa-solid fa-magnifying-glass"></i></a></li>
+        <li><a class="active" href="world.html"><i class="fa-solid fa-earth-americas"></i></a></li>
+        <li><a href="#" id="feedback-link" title="Send Feedback"><i class="fa-solid fa-comment"></i></a></li>
+      </ul>
+    </nav>
+  </div>
+</body>
+<!-- javascript -->
+<script src="js/world.js"></script>
+</html>

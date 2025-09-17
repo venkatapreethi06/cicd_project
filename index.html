@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- links -->
+  <link rel="icon" type="png" href="img/icon.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Title -->
+  <title>Weather App - Local Weather</title>
+</head>
+
+<body>
+  <div id="screen">
+    <!-- Background Effects -->
+    <div class="background-effects">
+      <!-- Stars for night time -->
+      <div class="stars">
+        <div class="star star-1"></div>
+        <div class="star star-2"></div>
+        <div class="star star-3"></div>
+        <div class="star star-4"></div>
+        <div class="star star-5"></div>
+        <div class="star star-6"></div>
+        <div class="star star-7"></div>
+        <div class="star star-8"></div>
+        <div class="star star-9"></div>
+        <div class="star star-10"></div>
+      </div>
+      
+      <!-- Rain drops for rainy weather -->
+      <div class="rain-drops">
+        <div class="rain-drop drop-1"></div>
+        <div class="rain-drop drop-2"></div>
+        <div class="rain-drop drop-3"></div>
+        <div class="rain-drop drop-4"></div>
+        <div class="rain-drop drop-5"></div>
+        <div class="rain-drop drop-6"></div>
+        <div class="rain-drop drop-7"></div>
+        <div class="rain-drop drop-8"></div>
+        <div class="rain-drop drop-9"></div>
+        <div class="rain-drop drop-10"></div>
+      </div>
+    </div>
+
+    <!-- live date and reset button row -->
+    <div style="display:flex; justify-content:center; align-items:center; gap:16px; margin-top:20px; margin-bottom:10px;">
+      <div class="live-date" style="font-weight:500; font-size:1.2rem;"></div>
+      <button id="reset-location-btn" style="padding:6px 16px; border-radius:8px; background:#332464; color:#fff; border:none; cursor:pointer; font-size:0.95rem;">Reset Location</button>
+    </div>
+
+    <!-- city name -->
+    <div class="city-name">
+      <i class="fa-solid fa-map-pin"></i>
+      <h1 id="city-name">Mumbai</h1>
+    </div>
+
+    <!-- weather icon -->
+    <div class="weather-icon-css">
+      <img class="weather-icon" src="img/sun.png" />
+    </div>
+
+    <!-- weather details -->
+    <div class="weather-description">
+      <div class="show-metric" id="metric">0°</div>
+      <div class="weather-details">
+        <div class="weather-main" id="weather-main">Sunny</div>
+        <div class="weather-metrics">
+          <div class="metric-item">
+            <i class="fas fa-tint"></i>
+            <span>H: <span id="humidity">60</span>%</span>
+          </div>
+          <div class="metric-item">
+            <i class="fas fa-thermometer-half"></i>
+            <span>F: <span id="feels-like">60</span>°</span>
+          </div>
+          <div class="metric-item">
+            <i class="fas fa-wind"></i>
+            <span>W: <span id="wind-speed">5</span> km/h</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weather Alerts -->
+    <div id="weather-alerts" class="weather-alerts" style="display: none;">
+      <div class="alert-content">
+        <i class="fas fa-exclamation-triangle alert-icon"></i>
+        <div class="alert-text">
+          <h4 id="alert-title">Weather Alert</h4>
+          <p id="alert-description">Severe weather conditions detected</p>
+        </div>
+        <button class="alert-close" onclick="closeAlert()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Weather Tips & Recommendations -->
+    <div class="weather-tips-section">
+      <div class="tips-container">
+        <div class="tips-header">
+          <i class="fas fa-lightbulb"></i>
+          <h4>Weather Tips</h4>
+        </div>
+        <div id="weather-tips" class="weather-tips">
+          <div class="tip-item">
+            <i class="fas fa-sun"></i>
+            <span>Enjoy the beautiful weather today!</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="recommendations-container">
+        <div class="recommendations-header">
+          <i class="fas fa-star"></i>
+          <h4>Recommendations</h4>
+        </div>
+        <div id="weather-recommendations" class="weather-recommendations">
+          <div class="recommendation-item">
+            <i class="fas fa-walking"></i>
+            <span>Perfect day for outdoor activities</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weather Map -->
+    <div class="weather-map-section">
+      <div class="map-container">
+        <div class="map-header">
+          <h4><i class="fas fa-map"></i> Weather Map</h4>
+          <div class="map-search-container">
+            <div class="map-search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" id="location-search" placeholder="Search for a location..." autocomplete="off">
+            </div>
+            <div class="map-controls">
+              <button class="map-control-btn active" data-view="temperature">
+                <i class="fas fa-thermometer-half"></i> Temp
+              </button>
+              <button class="map-control-btn" data-view="precipitation">
+                <i class="fas fa-cloud-rain"></i> Rain
+              </button>
+              <button class="map-control-btn" data-view="wind">
+                <i class="fas fa-wind"></i> Wind
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="weather-map" style="height: 400px; width: 100%;"></div>
+      </div>
+    </div>
+
+    <!-- Today-forecast -->
+    <div class="forcasts-box">
+      <div class="today-forecast">
+        <h4>TODAY</h4>
+        <div class="weather-icon-today">
+          <img class="weather-icons" src="img/sun.png" />
+        </div>
+        <div class="temp-today">
+          <span id="temp-min-today">50°</span><span>/ </span
+          ><span id="temp-max-today">55°</span>
+        </div>
+        <div class="weather-main-today" id="weather-main">Sunny</div>
+      </div>
+
+      <!-- 5day Forecast -->
+      <div class="future-forecast">
+        <h5>6-DAYS FORECAST</h5>
+        <div id="future-forecast-box"></div>
+      </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal">
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-header">
+          <h3>Send Feedback</h3>
+          <button class="feedback-close" id="feedback-close">&times;</button>
+        </div>
+        <form id="feedback-form" class="feedback-form">
+          <div class="form-group">
+            <label for="feedback-name">Name</label>
+            <input type="text" id="feedback-name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="feedback-email">Email</label>
+            <input type="email" id="feedback-email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="feedback-message">Feedback</label>
+            <textarea id="feedback-message" name="message" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="feedback-submit">Send Feedback</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- nav section -->
+    <nav>
+      <ul>
+        <li>
+          <a class="active" href="index.html"
+            ><i class="fa-solid fa-location-arrow"></i
+          ></a>
+        </li>
+        <li>
+          <a href="search.html"
+            ><i class="fa-solid fa-magnifying-glass"></i
+          ></a>
+        </li>
+        <li>
+          <a href="world.html"><i class="fa-solid fa-earth-americas"></i></a>
+        </li>
+        <li>
+          <a href="#" id="feedback-link" title="Send Feedback"><i class="fa-solid fa-comment"></i></a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="js/main.js"></script>
+</body>
+
+</html>
+      <!-- script -->
+    <script src="js/main.js"></script>
+    <script>
+      document.getElementById('reset-location-btn').onclick = function() {
+        localStorage.removeItem('askedLocation');
+        localStorage.removeItem('lastLat');
+        localStorage.removeItem('lastLon');
+        alert('Location permission reset. Reload the page to be prompted again.');
+      };
+    </script>
+    <script>
+      function updateLiveDateIndex() {
+        const dateElem = document.querySelector('.live-date');
+        if (!dateElem) return;
+        const now = new Date();
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const day = days[now.getDay()];
+        const month = months[now.getMonth()];
+        const date = now.getDate();
+        const year = now.getFullYear();
+        const time = now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+        dateElem.textContent = `${day}, ${month} ${date}, ${year} | ${time}`;
+      }
+      setInterval(updateLiveDateIndex, 1000);
+      updateLiveDateIndex();
+    </script>
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  </body>
+  </html>

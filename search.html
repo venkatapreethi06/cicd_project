@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- links -->
+  <link rel="icon" type="png" href="img/icon.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/search.css" />
+  <!-- Title -->
+  <title>Weather Search - Find Local Weather</title>
+</head>
+
+<body>
+  <div id="screen">
+    <!-- main section -->
+    <h3>Search For City</h3>
+
+    <!-- location status -->
+    <div class="location-status-container">
+      <div class="location-status"></div>
+      <button class="location-btn" title="Get current location">
+        <i class="fa-solid fa-location-crosshairs"></i>
+        <span>Use My Location</span>
+      </button>
+    </div>
+
+    <!-- search -->
+    <div class="search">
+      <div class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+      <input class="searchinput" type="text" placeholder="Search for city, state, or country...">
+      <button class="search-btn" title="Search">
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- message -->
+    <div class="message">
+      <div class="message-icon">
+        <i class="fa-solid fa-cloud-sun"></i>
+      </div>
+      <p>You can search by city name, or use "City, State, Country" format for more precision.</p>
+      <div class="message-examples">
+        <span>Examples: "London", "New York, NY", "Paris, France"</span>
+      </div>
+    </div>
+
+    <!-- error message -->
+    <div class="error-message">
+      <div class="error-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <p>One of the specified locations (city, state, or country) was not found. Please try again with a different location.</p>
+      <div class="error-suggestions">
+        <span>Try: "London", "New York", "Tokyo", "Sydney"</span>
+      </div>
+    </div>
+    <!-- weather -->
+    <div class="return">
+      <div class="box">
+        <div class="weather-box">
+          <div class="name">
+            <div class="city-name">Landon</div>
+            <div class="weather-temp">20°</div>
+          </div>
+          <div class="weather-icon"><img class="weather-img" src="img/haze.png" alt=""></div>
+        </div>
+        <!-- 1 -->
+        <div class="weather-desc">
+          <div class="desc-box">
+            <div class="desc-icon"><i class="fa-solid fa-wind"></i></div>
+            <div class="desc-name">Wind</div>
+            <div class="desc-info wind">15 m/s</div>
+          </div>
+
+          <div class="desc-box">
+            <div class="desc-icon"><i class="fa-solid fa-temperature-full"></i></div>
+            <div class="desc-name">Pressure</div>
+            <div class="desc-info pressure">15 mbar</div>
+          </div>
+
+          <div class="desc-box">
+            <div class="desc-icon"><i class="fa-solid fa-droplet"></i></div>
+            <div class="desc-name">Humidity</div>
+            <div class="desc-info humidity">50%</div>
+          </div>
+        </div>
+        <!-- 2 -->
+        <div class="weather-desc">
+          <div class="desc-box">
+            <div class="desc-icon"><i class="fa-solid fa-sun"></i></div>
+            <div class="desc-name">Sun Rise</div>
+            <div class="desc-info sunrise">12:00:00</div>
+          </div>
+
+          <div class="desc-box">
+            <div class="desc-icon"><i class="fa-solid fa-cloud-sun"></i></div>
+            <div class="desc-name">Sun Set</div>
+            <div class="desc-info sunset">12:00:00</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal">
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-header">
+          <h3>Send Feedback</h3>
+          <button class="feedback-close" id="feedback-close">&times;</button>
+        </div>
+        <form id="feedback-form" class="feedback-form">
+          <div class="form-group">
+            <label for="feedback-name">Name</label>
+            <input type="text" id="feedback-name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="feedback-email">Email</label>
+            <input type="email" id="feedback-email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="feedback-message">Feedback</label>
+            <textarea id="feedback-message" name="message" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="feedback-submit">Send Feedback</button>
+        </form>
+      </div>
+    </div>
+    <!-- nav section -->
+    <nav>
+      <ul>
+        <li><a href="index.html"><i class="fa-solid fa-location-arrow"></i></a></li>
+        <li><a class="active" href="search.html"><i class="fa-solid fa-magnifying-glass"></i></a></li>
+        <li><a href="world.html"><i class="fa-solid fa-earth-americas"></i></a></li>
+        <li><a href="#" id="feedback-link" title="Send Feedback"><i class="fa-solid fa-comment"></i></a></li>
+      </ul>
+    </nav>
+  </div>
+  <!-- main.js -->
+  <script src="js/search.js"></script>
+</body>
+
+</html>

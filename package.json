@@ -1,0 +1,15 @@
+{
+  "name": "weather-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "http-server . -p 3000 -c-1 --cors",
+    "start": "http-server . -p 3000 -c-1 --cors",
+    "serve": "http-server . -p 3000 -c-1 --cors"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
