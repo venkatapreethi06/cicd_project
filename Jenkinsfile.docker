@@ -1,0 +1,121 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'weather-app'
+        DOCKER_TAG = "${env.BUILD_NUMBER}"
+        DOCKER_REGISTRY = 'your-registry.com' // Replace with your registry
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code...'
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh """
+                    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+                """
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                echo 'Running application tests...'
+                sh """
+                    # Start the container for testing
+                    docker run -d --name weather-app-test-${BUILD_NUMBER} -p 3001:3000 ${DOCKER_IMAGE}:${DOCKER_TAG}
+
+                    # Wait for the application to start
+                    sleep 15
+
+                    # Run basic health check
+                    curl -f --max-time 10 http://localhost:3001 || exit 1
+
+                    # Stop and remove test container
+                    docker stop weather-app-test-${BUILD_NUMBER}
+                    docker rm weather-app-test-${BUILD_NUMBER}
+                """
+            }
+        }
+
+        stage('Push to Registry') {
+            steps {
+                echo 'Pushing Docker image to registry...'
+                sh """
+                    # Login to registry (configure credentials in Jenkins)
+                    docker login ${DOCKER_REGISTRY} -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+
+                    # Push images
+                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker tag ${DOCKER_IMAGE}:latest ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
+                    docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
+                """
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying to production environment...'
+                sh """
+                    # Stop existing container
+                    docker stop weather-app-prod || true
+                    docker rm weather-app-prod || true
+
+                    # Run new container
+                    docker run -d \
+                        --name weather-app-prod \
+                        -p 3000:3000 \
+                        --restart unless-stopped \
+                        --label "app=weather-app" \
+                        --label "version=${DOCKER_TAG}" \
+                        ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}
+                """
+            }
+        }
+
+        stage('Post-Deployment Verification') {
+            steps {
+                echo 'Verifying production deployment...'
+                sh """
+                    # Wait for deployment
+                    sleep 10
+
+                    # Verify the application is running
+                    curl -f --max-time 10 http://localhost:3000 || exit 1
+
+                    echo '✅ Deployment verification successful!'
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up Docker resources...'
+            sh """
+                # Remove build images
+                docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
+                docker rmi ${DOCKER_IMAGE}:latest || true
+
+                # Clean up dangling resources
+                docker system prune -f
+            """
+        }
+        success {
+            echo '🎉 CI/CD pipeline completed successfully!'
+            echo "🌐 Application is running at http://localhost:3000"
+        }
+        failure {
+            echo '❌ CI/CD pipeline failed!'
+            // Send notification (configure email/Slack in Jenkins)
+        }
+    }
+}

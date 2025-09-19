@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: jenkins-dockerfile
+    container_name: weather-app-jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - /usr/lib/x86_64-linux-gnu/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7
+    env_file:
+      - .env.jenkins
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - cicd-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Docker-in-Docker service (alternative approach)
+  dind:
+    image: docker:dind
+    container_name: weather-app-dind
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    networks:
+      - cicd-network
+    # Uncomment if you want to use separate DinD container
+    # ports:
+    #   - "2376:2376"
+
+volumes:
+  jenkins_home:
+    driver: local
+
+networks:
+  cicd-network:
+    driver: bridge
