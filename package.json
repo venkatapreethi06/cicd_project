@@ -8,7 +8,9 @@
     "start": "http-server . -p 3000 -c-1 --cors",
     "serve": "http-server . -p 3000 -c-1 --cors"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1"
+  },
   "devDependencies": {
     "http-server": "^14.1.1"
   }

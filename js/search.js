@@ -335,37 +335,42 @@ document.addEventListener('DOMContentLoaded', function() {
         const message = formData.get('message');
 
         try {
-            const response = await fetch('https://api.resend.com/emails', {
+            // Using Formspree for direct email delivery to Gmail
+            // Create a free account at https://formspree.io/ and get your form endpoint
+            const formspreeEndpoint = 'https://formspree.io/f/xnnbejgl'; // Your Formspree form ID
+
+            const response = await fetch(formspreeEndpoint, {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer re_hvV3MeXb_38fRDfBugnkg3AX2urT6uJMc',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    from: 'Weather App <onboarding@resend.dev>',
-                    to: [email, 'muktharbasha123ab@gmail.com'],
-                    subject: 'Weather App Feedback from ' + name,
-                    html: `
-                        <h2>New Feedback Received</h2>
-                        <p><strong>Name:</strong> ${name}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Message:</strong></p>
-                        <p>${message.replace(/\n/g, '<br>')}</p>
-                    `
+                    name: name,
+                    email: email,
+                    message: message,
+                    _subject: `Weather App Feedback from ${name}`,
+                    _replyto: email
                 })
             });
 
             if (response.ok) {
-                alert('Thank you for your feedback! We have sent a copy to your email.');
+                alert('Thank you for your feedback! It has been sent to our team.');
                 feedbackForm.reset();
                 feedbackModal.style.display = 'none';
             } else {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to send feedback');
+                throw new Error(errorData.error || 'Failed to send feedback');
             }
+
         } catch (error) {
             console.error('Error sending feedback:', error);
-            alert('Sorry, there was an error sending your feedback. Please try again later.');
+
+            // Fallback: Show the feedback data for manual handling
+            alert(`Feedback received!\n\nName: ${name}\nEmail: ${email}\nMessage: ${message}\n\nPlease copy this information and send it manually to muktharbasha123ab@gmail.com`);
+
+            feedbackForm.reset();
+            feedbackModal.style.display = 'none';
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
