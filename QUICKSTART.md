@@ -87,7 +87,7 @@ weather-app/
 ├── setup-cicd.sh          # Linux/Mac setup
 ├── setup-cicd.bat         # Windows setup
 ├── .env.jenkins           # Environment template
-└── README.md              # Full documentation
+└── QUICKSTART.md          # This guide
 ```
 
 That's it! Your CI/CD pipeline is now running in Docker! 🎉
