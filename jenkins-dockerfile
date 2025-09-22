@@ -25,7 +25,6 @@ RUN jenkins-plugin-cli --plugins \
     workflow-aggregator \
     credentials-binding \
     timestamper \
-    ansi-color \
     copyartifact
 
 # Environment variables

@@ -177,6 +177,32 @@
       </div>
     </div>
 
+    <!-- Feedback Section -->
+    <div class="feedback-section">
+      <div class="feedback-container">
+        <div class="feedback-header">
+          <i class="fas fa-comments"></i>
+          <h4>Feedback</h4>
+        </div>
+        <form id="feedback-form" class="feedback-form">
+          <input type="hidden" name="_recipient" value="muktharbasha123ab@gmail.com">
+          <div class="form-group">
+            <input type="text" id="feedback-name" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" id="feedback-email" placeholder="Your Email" required>
+          </div>
+          <div class="form-group">
+            <textarea id="feedback-message" placeholder="Your Feedback..." rows="4" required></textarea>
+          </div>
+          <button type="submit" class="feedback-submit-btn">
+            <i class="fas fa-paper-plane"></i> Send Feedback
+          </button>
+        </form>
+        <div id="feedback-status" class="feedback-status"></div>
+      </div>
+    </div>
+
     <!-- nav section -->
     <nav>
       <ul>
@@ -195,6 +221,11 @@
         </li>
       </ul>
     </nav>
+
+    <!-- Copyright Section -->
+    <div class="copyright-section">
+      <p>&copy; 2025 Weather App by Shaik Mukhtar Basha. All rights reserved.</p>
+    </div>
   </div>
 
   <!-- JavaScript -->

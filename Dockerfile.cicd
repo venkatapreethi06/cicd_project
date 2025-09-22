@@ -1,0 +1,42 @@
+# Multi-stage build for optimized CI/CD container
+FROM jenkins/jenkins:lts-jdk17 AS base
+
+# Switch to root for installation
+USER root
+
+# Install Docker CLI and other tools
+RUN apt-get update && apt-get install -y \
+    docker.io \
+    docker-compose \
+    curl \
+    git \
+    wget \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Docker Compose v2 (optional, for newer versions)
+RUN curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+    && chmod +x /usr/local/bin/docker-compose
+
+# Create docker group and add jenkins user to it
+RUN groupadd -f docker && usermod -aG docker jenkins
+
+# Install essential Jenkins plugins for CI/CD
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
+
+# Switch back to jenkins user
+USER jenkins
+
+# Set Jenkins home
+ENV JENKINS_HOME=/var/jenkins_home
+
+# Expose ports
+EXPOSE 8080 50000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/login || exit 1
+
+# Default command
+CMD ["jenkins.sh"]

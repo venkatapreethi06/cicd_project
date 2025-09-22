@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  cicd:
+    build:
+      context: .
+      dockerfile: Dockerfile.cicd
+    container_name: weather-app-cicd
+    ports:
+      - "8082:8080"  # Jenkins web UI
+      - "50000:50000"  # Jenkins agent port
+    volumes:
+      - cicd_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/workspace  # Mount the entire project for easy access
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - JENKINS_OPTS=--httpPort=8080
+    restart: unless-stopped
+    networks:
+      - cicd-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  cicd_home:
+    driver: local
+
+networks:
+  cicd-network:
+    driver: bridge

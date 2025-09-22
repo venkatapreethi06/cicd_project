@@ -1,0 +1,19 @@
+# Essential Jenkins plugins for CI/CD pipeline
+git:latest
+workflow-aggregator:latest
+docker-workflow:latest
+docker-plugin:latest
+pipeline-stage-view:latest
+github:latest
+credentials-binding:latest
+ssh-credentials:latest
+timestamper:latest
+ws-cleanup:latest
+build-timeout:latest
+email-ext:latest
+mailer:latest
+matrix-auth:latest
+role-strategy:latest
+job-dsl:latest
+prometheus:latest
+monitoring:latest

@@ -1135,4 +1135,50 @@ class WeatherMap {
 // Initialize weather map when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     new WeatherMap();
+
+    // Feedback form handler using Formspree
+    const feedbackForm = document.getElementById('feedback-form');
+    const feedbackStatus = document.getElementById('feedback-status');
+
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('feedback-name').value;
+            const email = document.getElementById('feedback-email').value;
+            const message = document.getElementById('feedback-message').value;
+
+            // Show loading status
+            feedbackStatus.style.display = 'block';
+            feedbackStatus.className = 'feedback-status';
+            feedbackStatus.textContent = 'Sending feedback...';
+
+            try {
+                // Formspree API endpoint
+                const response = await fetch('https://formspree.io/f/xzzjpgnz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        message: message
+                    })
+                });
+
+                if (response.ok) {
+                    feedbackStatus.className = 'feedback-status success';
+                    feedbackStatus.textContent = 'Thank you for your feedback! We\'ll get back to you soon.';
+                    feedbackForm.reset();
+                } else {
+                    throw new Error('Failed to send');
+                }
+            } catch (error) {
+                console.error('Error sending feedback:', error);
+                feedbackStatus.className = 'feedback-status error';
+                feedbackStatus.textContent = 'Failed to send feedback. Please try again later.';
+            }
+        });
+    }
 });

@@ -1,0 +1,161 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'weather-app'
+        DOCKER_TAG = "${env.BUILD_NUMBER}"
+        APP_PORT = '3000'
+        TEST_PORT = '3001'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo '🔄 Checking out source code...'
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo '🏗️ Building Docker image...'
+                bat """
+                    docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .
+                    docker tag %DOCKER_IMAGE%:%DOCKER_TAG% %DOCKER_IMAGE%:latest
+                """
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                echo '🧪 Running application tests...'
+                bat """
+                    @echo off
+                    echo Starting test container...
+                    docker run -d --name weather-app-test-%BUILD_NUMBER% -p %TEST_PORT%:%APP_PORT% %DOCKER_IMAGE%:%DOCKER_TAG%
+
+                    echo Waiting for application to start...
+                    timeout /t 30 /nobreak >nul 2>&1
+
+                    echo Testing application health...
+                    powershell -Command "try { Invoke-WebRequest -Uri http://localhost:%TEST_PORT% -TimeoutSec 10 -UseBasicParsing | Out-Null; exit 0 } catch { exit 1 }"
+
+                    echo Cleaning up test container...
+                    docker stop weather-app-test-%BUILD_NUMBER% 2>nul
+                    docker rm weather-app-test-%BUILD_NUMBER% 2>nul
+
+                    echo ✅ Application test passed!
+                """
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                echo '🚀 Deploying to staging environment...'
+                bat """
+                    @echo off
+                    echo Stopping existing staging container...
+                    docker stop weather-app-staging 2>nul
+                    docker rm weather-app-staging 2>nul
+
+                    echo Deploying new version to staging...
+                    docker run -d ^
+                        --name weather-app-staging ^
+                        -p 3001:%APP_PORT% ^
+                        --restart unless-stopped ^
+                        --label "app=weather-app" ^
+                        --label "environment=staging" ^
+                        --label "version=%DOCKER_TAG%" ^
+                        %DOCKER_IMAGE%:%DOCKER_TAG%
+
+                    echo ✅ Staging deployment complete!
+                """
+            }
+        }
+
+        stage('Staging Verification') {
+            steps {
+                echo '✅ Verifying staging deployment...'
+                bat """
+                    @echo off
+                    echo Waiting for staging deployment...
+                    timeout /t 10 /nobreak >nul
+
+                    echo Testing staging endpoint...
+                    powershell -Command "try { Invoke-WebRequest -Uri http://localhost:3001 -TimeoutSec 10 -UseBasicParsing | Out-Null; exit 0 } catch { exit 1 }"
+
+                    echo 🎉 Staging deployment verified!
+                """
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                echo '🎯 Deploying to production...'
+                bat """
+                    @echo off
+                    echo Stopping existing production container...
+                    docker stop weather-app-prod 2>nul
+                    docker rm weather-app-prod 2>nul
+
+                    echo Deploying to production...
+                    docker run -d ^
+                        --name weather-app-prod ^
+                        -p %APP_PORT%:%APP_PORT% ^
+                        --restart unless-stopped ^
+                        --label "app=weather-app" ^
+                        --label "environment=production" ^
+                        --label "version=%DOCKER_TAG%" ^
+                        %DOCKER_IMAGE%:%DOCKER_TAG%
+
+                    echo ✅ Production deployment complete!
+                """
+            }
+        }
+
+        stage('Production Verification') {
+            steps {
+                echo '🎯 Verifying production deployment...'
+                bat """
+                    @echo off
+                    echo Waiting for production deployment...
+                    timeout /t 15 /nobreak >nul
+
+                    echo Testing production endpoint...
+                    powershell -Command "try { Invoke-WebRequest -Uri http://localhost:%APP_PORT% -TimeoutSec 10 -UseBasicParsing | Out-Null; exit 0 } catch { exit 1 }"
+
+                    echo 🎉 Production deployment successful!
+                    echo 🌐 Application is live at http://localhost:%APP_PORT%
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            echo '🧹 Cleaning up resources...'
+            bat """
+                @echo off
+                echo Removing build images...
+                docker rmi %DOCKER_IMAGE%:%DOCKER_TAG% 2>nul || echo Image cleanup skipped
+
+                echo Cleaning up stopped containers...
+                docker container prune -f
+
+                echo Cleaning up dangling images...
+                docker image prune -f
+
+                echo 🧹 Cleanup complete!
+            """
+        }
+        success {
+            echo '🎉 CI/CD Pipeline completed successfully!'
+            echo "📊 Build #%BUILD_NUMBER% deployed to production"
+            echo "🌐 Production URL: http://localhost:%APP_PORT%"
+        }
+        failure {
+            echo '❌ CI/CD Pipeline failed!'
+            echo '🔍 Check the logs above for details'
+        }
+    }
+}
